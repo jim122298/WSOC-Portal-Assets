@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Woods System of Care Memory Match</title>
+
+  <style>
+    :root {
+      --accent: #653594;
+      --accent-dark: #4d2675;
+      --accent-soft: rgba(101, 53, 148, 0.12);
+      --text: #252033;
+      --muted: #6e6679;
+      --panel: #ffffff;
+
+      --columns: 6;
+      --rows: 5;
+      --gap: clamp(5px, 0.8vmin, 11px);
+      --header-space: 202px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+      font-family:
+        "Avenir Next",
+        Avenir,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+      color: var(--text);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .game-shell {
+      width: min(1180px, 100%);
+      height: 100svh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+      padding:
+        max(7px, env(safe-area-inset-top))
+        max(8px, env(safe-area-inset-right))
+        max(7px, env(safe-area-inset-bottom))
+        max(8px, env(safe-area-inset-left));
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .top-area {
+      flex: 0 0 auto;
+      overflow: visible;
+    }
+
+    .game-header {
+      text-align: center;
+      overflow: visible;
+    }
+
+    .woods-logo {
+      width: auto;
+      height: clamp(43px, 7vmin, 68px);
+      max-width: min(84vw, 380px);
+      display: block;
+      margin: 0 auto 1px;
+      object-fit: contain;
+    }
+
+    .game-title {
+      margin: 1px 0 0;
+      display: inline-block;
+      padding: 5px 10px 7px;
+      overflow: visible;
+      font-family:
+        "Arial Rounded MT Bold",
+        "Trebuchet MS",
+        "Avenir Next",
+        sans-serif;
+      font-size: clamp(20px, 3.2vmin, 35px);
+      font-weight: 900;
+      line-height: 1.18;
+      letter-spacing: -0.025em;
+      background:
+        linear-gradient(
+          90deg,
+          var(--accent-dark),
+          #8353b1,
+          var(--accent),
+          var(--accent-dark)
+        );
+      background-size: 220% auto;
+      color: var(--accent);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter:
+        drop-shadow(
+          0 2px 4px rgba(101, 53, 148, 0.12)
+        );
+      animation:
+        titleFade 4.5s ease-in-out infinite,
+        titleShimmer 7s linear infinite;
+    }
+
+    .game-header p {
+      margin: 1px 0 0;
+      color: var(--muted);
+      font-size: clamp(10px, 1.45vmin, 13px);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 32px);
+      margin: 6px 0;
+      padding: 5px 10px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(101, 53, 148, 0.07),
+          rgba(101, 53, 148, 0.025)
+        );
+      border: 1px solid rgba(101, 53, 148, 0.13);
+      border-radius: 13px;
+    }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 32px);
+    }
+
+    .stat {
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: clamp(8px, 1.1vmin, 10px);
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 1px;
+      color: var(--accent);
+      font-size: clamp(15px, 2.3vmin, 21px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .restart-button {
+      flex: 0 0 auto;
+      padding: 7px 15px;
+      border: 0;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          135deg,
+          #7544a4,
+          var(--accent-dark)
+        );
+      color: #ffffff;
+      font-size: clamp(10px, 1.4vmin, 13px);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow:
+        0 5px 13px rgba(101, 53, 148, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition:
+        transform 160ms ease,
+        filter 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .restart-button:hover,
+    .restart-button:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.09);
+      box-shadow:
+        0 8px 17px rgba(101, 53, 148, 0.29),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      outline: none;
+    }
+
+    .board-area {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .game-board {
+      --card-size: min(
+        calc(
+          (
+            min(1180px, 100vw) -
+            16px -
+            ((var(--columns) - 1) * var(--gap))
+          ) / var(--columns)
+        ),
+        calc(
+          (
+            100svh -
+            var(--header-space) -
+            ((var(--rows) - 1) * var(--gap))
+          ) / var(--rows)
+        )
+      );
+
+      width: calc(
+        (var(--card-size) * var(--columns)) +
+        ((var(--columns) - 1) * var(--gap))
+      );
+
+      display: grid;
+      grid-template-columns:
+        repeat(var(--columns), var(--card-size));
+      grid-auto-rows: var(--card-size);
+      gap: var(--gap);
+      align-content: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    .memory-card:nth-child(25) {
+      grid-column: 3;
+    }
+
+    .memory-card {
+      position: relative;
+      width: var(--card-size);
+      height: var(--card-size);
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: clamp(8px, 1.5vmin, 18px);
+      background: transparent;
+      cursor: pointer;
+      perspective: 1000px;
+      appearance: none;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .memory-card:focus-visible {
+      outline: 3px solid rgba(101, 53, 148, 0.42);
+      outline-offset: 2px;
+    }
+
+    .card-inner {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      transform-style: preserve-3d;
+      transition:
+        transform 420ms cubic-bezier(.2, .72, .2, 1);
+    }
+
+    .memory-card.flipped .card-inner,
+    .memory-card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: inherit;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-front {
+      background: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.16);
+    }
+
+    .card-front img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .card-back {
+      padding: clamp(2px, 0.55vmin, 6px);
+      background: #ffffff;
+      border:
+        1px solid rgba(101, 53, 148, 0.15);
+      box-shadow:
+        0 3px 9px rgba(45, 32, 63, 0.12);
+      transform: rotateY(180deg);
+    }
+
+    .card-back img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .memory-card.matched {
+      cursor: default;
+    }
+
+    .memory-card.matched .card-back {
+      border-color:
+        rgba(101, 53, 148, 0.68);
+      box-shadow:
+        0 0 0 2px rgba(101, 53, 148, 0.16),
+        0 4px 11px rgba(101, 53, 148, 0.19);
+      animation:
+        matchedPulse 460ms ease;
+    }
+
+    .memory-card.matched .card-back::after {
+      content: "✓";
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: clamp(16px, 2.7vmin, 25px);
+      height: clamp(16px, 2.7vmin, 25px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: clamp(9px, 1.7vmin, 14px);
+      font-weight: 900;
+      box-shadow:
+        0 3px 9px rgba(101, 53, 148, 0.26);
+    }
+
+    .feedback {
+      flex: 0 0 auto;
+      min-height: 17px;
+      margin-top: 3px;
+      text-align: center;
+      color: var(--muted);
+      font-size: clamp(10px, 1.4vmin, 13px);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .feedback.match {
+      color: var(--accent);
+    }
+
+    .fact-popup {
+      position: fixed;
+      z-index: 200;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(25, 12, 37, 0.56);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .fact-popup.show {
+      display: flex;
+      animation: fadeIn 180ms ease;
+    }
+
+    .fact-card {
+      position: relative;
+      width: min(620px, 100%);
+      max-height: calc(100svh - 28px);
+      overflow-y: auto;
+      padding: 24px 28px 24px;
+      text-align: center;
+      background:
+        radial-gradient(
+          circle at top,
+          rgba(101, 53, 148, 0.09),
+          transparent 52%
+        ),
+        #ffffff;
+      border:
+        1px solid rgba(101, 53, 148, 0.18);
+      border-radius: 25px;
+      box-shadow:
+        0 22px 65px rgba(25, 12, 37, 0.3);
+      animation:
+        popIn 260ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .fact-logo-wrap {
+      width: 100%;
+      min-height: 150px;
+      height: clamp(150px, 24vmin, 220px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      padding: 4px 8px;
+    }
+
+    .fact-logo {
+      width: auto;
+      height: auto;
+      max-width: 96%;
+      max-height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      filter:
+        drop-shadow(
+          0 6px 12px rgba(45, 32, 63, 0.14)
+        );
+      animation:
+        factLogoArrival
+        420ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .fact-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .fact-card h2 {
+      margin: 13px 0 9px;
+      color: var(--accent-dark);
+      font-family:
+        "Arial Rounded MT Bold",
+        "Trebuchet MS",
+        sans-serif;
+      font-size: clamp(21px, 4vw, 30px);
+      line-height: 1.15;
+    }
+
+    .fact-text {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(15px, 2.5vw, 18px);
+      line-height: 1.5;
+    }
+
+    .fact-continue {
+      margin-top: 20px;
+      padding: 11px 25px;
+      border: 0;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          135deg,
+          #7544a4,
+          var(--accent-dark)
+        );
+      color: #ffffff;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow:
+        0 7px 18px rgba(101, 53, 148, 0.23);
+      transition:
+        transform 160ms ease,
+        filter 160ms ease;
+    }
+
+    .fact-continue:hover,
+    .fact-continue:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.09);
+      outline: none;
+    }
+
+    .completion-panel {
+      position: fixed;
+      z-index: 300;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(25, 12, 37, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .completion-panel.show {
+      display: flex;
+    }
+
+    .completion-card {
+      width: min(430px, 100%);
+      padding: 29px 23px;
+      text-align: center;
+      background:
+        radial-gradient(
+          circle at top,
+          rgba(101, 53, 148, 0.1),
+          transparent 58%
+        ),
+        #ffffff;
+      border:
+        1px solid rgba(101, 53, 148, 0.17);
+      border-radius: 23px;
+      box-shadow:
+        0 20px 60px rgba(25, 12, 37, 0.28);
+    }
+
+    .completion-card h2 {
+      margin: 0;
+      color: var(--accent-dark);
+      font-family:
+        "Arial Rounded MT Bold",
+        "Trebuchet MS",
+        sans-serif;
+      font-size: 28px;
+    }
+
+    .completion-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .completion-score {
+      margin-top: 15px;
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .play-again-button {
+      margin-top: 18px;
+      padding: 11px 21px;
+      border: 0;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          135deg,
+          #7544a4,
+          var(--accent-dark)
+        );
+      color: #ffffff;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow:
+        0 7px 18px rgba(101, 53, 148, 0.23);
+    }
+
+    @keyframes titleFade {
+      0%,
+      100% {
+        opacity: 0.78;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes titleShimmer {
+      from {
+        background-position: 220% center;
+      }
+
+      to {
+        background-position: -220% center;
+      }
+    }
+
+    @keyframes matchedPulse {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.055);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform:
+          translateY(12px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform:
+          translateY(0) scale(1);
+      }
+    }
+
+    @keyframes factLogoArrival {
+      from {
+        opacity: 0;
+        transform:
+          translateY(-8px) scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform:
+          translateY(0) scale(1);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --columns: 4;
+        --rows: 7;
+        --header-space: 194px;
+        --gap: clamp(4px, 1.2vw, 8px);
+      }
+
+      .game-shell {
+        padding:
+          max(5px, env(safe-area-inset-top))
+          max(5px, env(safe-area-inset-right))
+          max(5px, env(safe-area-inset-bottom))
+          max(5px, env(safe-area-inset-left));
+      }
+
+      .woods-logo {
+        height: clamp(37px, 11vw, 52px);
+        max-width: 86vw;
+      }
+
+      .game-title {
+        margin-top: 0;
+        padding: 4px 8px 6px;
+        font-size: clamp(18px, 5.7vw, 27px);
+        line-height: 1.2;
+        letter-spacing: -0.015em;
+      }
+
+      .game-header p {
+        margin-top: 0;
+        font-size: clamp(9px, 2.8vw, 11px);
+      }
+
+      .toolbar {
+        gap: 7px;
+        margin: 4px 0;
+        padding: 5px 7px;
+      }
+
+      .stats {
+        flex: 1 1 auto;
+        gap: 5px;
+        justify-content: space-around;
+      }
+
+      .stat {
+        min-width: 40px;
+      }
+
+      .restart-button {
+        padding: 7px 10px;
+        font-size: 9px;
+      }
+
+      .game-board {
+        --card-size: min(
+          calc(
+            (
+              100vw -
+              10px -
+              ((var(--columns) - 1) * var(--gap))
+            ) / var(--columns)
+          ),
+          calc(
+            (
+              100svh -
+              var(--header-space) -
+              ((var(--rows) - 1) * var(--gap))
+            ) / var(--rows)
+          )
+        );
+      }
+
+      .memory-card:nth-child(25) {
+        grid-column: 2;
+      }
+
+      .fact-card {
+        width: min(94vw, 560px);
+        padding: 18px 16px 20px;
+        border-radius: 21px;
+      }
+
+      .fact-logo-wrap {
+        min-height: 115px;
+        height: clamp(115px, 34vw, 165px);
+        margin-bottom: 8px;
+        padding: 2px;
+      }
+
+      .fact-logo {
+        max-width: 98%;
+        max-height: 100%;
+      }
+    }
+
+    @media (max-height: 700px) {
+      :root {
+        --header-space: 162px;
+      }
+
+      .woods-logo {
+        height: 38px;
+        margin-bottom: 0;
+      }
+
+      .game-title {
+        padding-top: 3px;
+        padding-bottom: 5px;
+        line-height: 1.16;
+      }
+
+      .game-header p {
+        display: none;
+      }
+
+      .toolbar {
+        margin: 3px 0;
+      }
+
+      .feedback {
+        min-height: 14px;
+        margin-top: 2px;
+      }
+
+      .fact-card {
+        width: min(580px, 96vw);
+        padding-top: 14px;
+        padding-bottom: 15px;
+      }
+
+      .fact-logo-wrap {
+        min-height: 82px;
+        height: 105px;
+        margin-bottom: 5px;
+      }
+
+      .fact-card h2 {
+        margin-top: 7px;
+        margin-bottom: 5px;
+      }
+
+      .fact-text {
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .fact-continue {
+        margin-top: 11px;
+      }
+    }
+
+    @media (max-width: 700px) and (max-height: 700px) {
+      :root {
+        --header-space: 158px;
+      }
+
+      .fact-logo-wrap {
+        min-height: 75px;
+        height: 92px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner,
+      .fact-card,
+      .fact-popup,
+      .fact-logo,
+      .memory-card.matched .card-back,
+      .game-title {
+        transition: none;
+        animation: none;
+      }
+
+      .game-title {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="game-shell">
+
+    <div class="top-area">
+
+      <header class="game-header">
+
+        <img
+          class="woods-logo"
+          src="https://www.woods.org/wp-content/themes/woods/assets/imgs/Woods-Logo-Mobile@2x.png"
+          alt="Woods System of Care"
+        >
+
+        <h1 class="game-title">
+          Affiliate Memory Match
+        </h1>
+
+        <p>
+          Flip two cards and find all matching organization logos.
+        </p>
+
+      </header>
+
+      <section class="toolbar">
+
+        <div class="stats">
+
+          <div class="stat">
+            <span class="stat-label">Moves</span>
+            <span class="stat-value" id="movesValue">0</span>
+          </div>
+
+          <div class="stat">
+            <span class="stat-label">Matches</span>
+            <span class="stat-value" id="matchesValue">0</span>
+          </div>
+
+          <div class="stat">
+            <span class="stat-label">Time</span>
+            <span class="stat-value" id="timeValue">0:00</span>
+          </div>
+
+        </div>
+
+        <button
+          class="restart-button"
+          id="restartButton"
+          type="button"
+        >
+          Shuffle
+        </button>
+
+      </section>
+
+    </div>
+
+    <div class="board-area">
+
+      <section
+        class="game-board"
+        id="gameBoard"
+        aria-label="Affiliate logo memory game"
+      ></section>
+
+    </div>
+
+    <div
+      class="feedback"
+      id="feedback"
+      aria-live="polite"
+    >
+      Choose two cards.
+    </div>
+
+  </main>
+
+  <section
+    class="fact-popup"
+    id="factPopup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="factOrganization"
+  >
+
+    <div class="fact-card">
+
+      <div class="fact-logo-wrap">
+        <img
+          class="fact-logo"
+          id="factLogo"
+          src=""
+          alt=""
+        >
+      </div>
+
+      <div class="fact-badge">
+        Did You Know?
+      </div>
+
+      <h2 id="factOrganization"></h2>
+
+      <p
+        class="fact-text"
+        id="factText"
+      ></p>
+
+      <button
+        class="fact-continue"
+        id="factContinueButton"
+        type="button"
+      >
+        Continue
+      </button>
+
+    </div>
+
+  </section>
+
+  <section
+    class="completion-panel"
+    id="completionPanel"
+  >
+
+    <div class="completion-card">
+
+      <h2>🎉 You matched them all!</h2>
+
+      <p>
+        You completed the Woods System of Care affiliate memory challenge.
+      </p>
+
+      <div
+        class="completion-score"
+        id="completionScore"
+      ></div>
+
+      <button
+        class="play-again-button"
+        id="playAgainButton"
+        type="button"
+      >
+        Play Again
+      </button>
+
+    </div>
+
+  </section>
+
+  <script>
+    const faceCardImage =
+      "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Face%20cardddddd.png";
+
+    const set2Base =
+      "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/";
+
+    const organizations = [
+      {
+        id: "allies",
+        name: "Allies, Inc.",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Allies%2C%20Inc.%20Rounded%20Square%20Icon.png",
+        popupImage: set2Base + "allies-inc.png",
+        facts: [
+          "Allies, Inc. helps children and adults with intellectual and developmental disabilities build independence at home, at work, and in their communities.",
+          "Allies offers more than residential services—it also provides employment support, behavioral care, medical assistance, day programs, and horticultural therapy.",
+          "Allies, Inc. is CARF-accredited, recognizing its commitment to service quality, accountability, and continuous improvement."
+        ]
+      },
+      {
+        id: "archway",
+        name: "Archway Programs",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Archway%20Programs%20Rounded%20Square%20Icon.png",
+        popupImage: set2Base + "archway-programs.png",
+        facts: [
+          "Archway Programs was founded in 1965 and has served children, adults, and families for more than 60 years.",
+          "Archway Programs supports more than 1,800 people through special education, behavioral health, residential care, early intervention, and adult services.",
+          "Archway operates the Blue Violet Flower and Gift Shop, where individuals can develop valuable vocational and employment skills."
+        ]
+      },
+      {
+        id: "brians-house",
+        name: "Brian's House",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Brian%E2%80%99s%20House%20Rounded%20Square%20Icon.png",
+        popupImage: set2Base + "brians-house.png",
+        facts: [
+          "Brian’s House was founded in 1976 by Dave Tuttle, who wanted better opportunities for his son Brian and other people with disabilities.",
+          "One of the first Brian’s House residences opened inside a renovated historic home in West Chester, Pennsylvania.",
+          "Brian’s House now supports adults through community homes, day programs, employment opportunities, Lifesharing, and recreational activities."
+        ]
+      },
+      {
+        id: "bridgeway",
+        name: "Bridgeway Behavioral Health Services",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Bridgeway%20Behavioral%20Health%20Services%20Rounded%20Square%20Icon.png",
+        popupImage:
+          set2Base +
+          "bridgeway-behavioral-health-services.png",
+        facts: [
+          "Bridgeway Behavioral Health Services began with a single vocational program and grew to support thousands of people and families.",
+          "Bridgeway operates welcoming crisis centers that use a comfortable living-room model instead of a traditional hospital-style environment.",
+          "Bridgeway provides mobile crisis-response services connected to the 988 Suicide & Crisis Lifeline in several New Jersey counties."
+        ]
+      },
+      {
+        id: "legacy",
+        name: "Legacy Treatment Services",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Legacy%20Treatment%20Services%20Rounded%20Square%20Icon.png",
+        popupImage:
+          set2Base +
+          "legacy-treatment-services.png",
+        facts: [
+          "One of Legacy Treatment Services’ predecessor organizations began in 1864 as an orphanage for children affected by the Civil War.",
+          "Legacy Treatment Services was formed by bringing together several historic New Jersey organizations with long traditions of helping children and families.",
+          "One of Legacy’s predecessor agencies was among the first in New Jersey to employ a full-time social-service caseworker."
+        ]
+      },
+      {
+        id: "tabor",
+        name: "Tabor Children's Services",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Tabor%20Children%E2%80%99s%20Services%20Rounded%20Square%20Icon.png",
+        popupImage:
+          set2Base +
+          "tabor-childrens-services.png",
+        facts: [
+          "Tabor Children’s Services began in 1907 when Emma Chidester opened her home to children who needed a safe place to live.",
+          "Tabor welcomed children of different ages and genders so that brothers and sisters could remain together.",
+          "A former Tabor resident later wrote books about his childhood and donated proceeds to support other children and families."
+        ]
+      },
+      {
+        id: "woods-services",
+        name: "Woods Services",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Woods%20Services%20Rounded%20Square%20Icon.png",
+        popupImage:
+          set2Base +
+          "woods-system-of-care.png",
+        facts: [
+          "Woods Services has more than a century of experience supporting people with disabilities, autism, and complex medical or behavioral needs.",
+          "Woods began primarily as a special-education organization before expanding into healthcare, residential care, employment, and behavioral services.",
+          "Woods Services creates individualized plans that support the whole person instead of focusing on only one diagnosis or challenge."
+        ]
+      },
+      {
+        id: "woods-system",
+        name: "Woods System of Care",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Woods%20System%20of%20Care%20Rounded%20Square%20Icon.png",
+        popupImage:
+          set2Base +
+          "woods-system-of-care.png",
+        facts: [
+          "Woods System of Care connects organizations across Pennsylvania and New Jersey to create a coordinated network of support.",
+          "Woods System of Care brings together healthcare, education, housing, employment, behavioral health, and social services.",
+          "Woods System of Care is designed to support people throughout every stage of life, from childhood through adulthood and aging."
+        ]
+      },
+      {
+        id: "wcs",
+        name: "Woods Community Services",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/WCS%20WSOC.png",
+        popupImage:
+          set2Base +
+          "woods-community-services.png",
+        facts: [
+          "Woods Community Services creates community-based homes for adults with intellectual disabilities and complex support needs.",
+          "Some Woods Community Services homes help people move from hospitals or institutional settings into welcoming neighborhood residences.",
+          "Each Woods Community Services home is designed around the strengths, health needs, preferences, and goals of the people living there."
+        ]
+      },
+      {
+        id: "behavioral-health",
+        name: "The Center for Behavioral Health at Woods",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/The%20ceneter%20for%20Bheavioral%20health.png",
+        popupImage:
+          set2Base +
+          "the-center-for-behavioral-health.png",
+        facts: [
+          "The Center for Behavioral Health at Woods serves both Woods residents and people living in the surrounding community.",
+          "The Center specializes in helping people whose disabilities, communication needs, or medical conditions may make traditional behavioral healthcare difficult.",
+          "The Center provides evaluations, therapy, prevention, intervention, and ongoing follow-up care rather than treating only immediate crises."
+        ]
+      },
+      {
+        id: "medical-center",
+        name: "The Medical Center at Woods",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/The%20Medical%20Center.png",
+        popupImage:
+          set2Base +
+          "the-medical-center-at-woods.png",
+        facts: [
+          "The Medical Center at Woods provides healthcare designed to be accessible and comfortable for people with disabilities.",
+          "The Medical Center offers primary care, vaccinations, blood work, X-rays, wellness services, and chronic-condition management.",
+          "The Medical Center at Woods is recognized as a Patient-Centered Medical Home for its coordinated approach to healthcare."
+        ]
+      },
+      {
+        id: "abilities-northwest",
+        name: "Abilities of Northwest Jersey",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Abilities%20Of%20north%20west.png",
+        popupImage:
+          set2Base +
+          "abilities-of-northwest-jersey.png",
+        facts: [
+          "Abilities of Northwest Jersey helps people develop employment skills through real businesses, community jobs, and social enterprises.",
+          "Its employment programs have included printing, packaging, assembly, electronics recycling, retail, and other hands-on work experiences.",
+          "The PossAbilities Thrift Boutique operated by Abilities of Northwest Jersey received a local award for offering excellent value to shoppers."
+        ]
+      },
+      {
+        id: "abilities-solutions",
+        name: "Abilities Solutions",
+        image: "https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Abilitie%20soultions.png",
+        popupImage:
+          set2Base +
+          "abilities-solutions.png",
+        facts: [
+          "Abilities Solutions was founded in 1963 by parents who believed their children with disabilities deserved meaningful opportunities to work.",
+          "Abilities Solutions once operated a community appliance-repair service that also gave participants practical employment training.",
+          "After a fire destroyed its building in 1970, Abilities Solutions rebuilt and continued expanding its employment programs."
+        ]
+      }
+    ];
+
+    const gameBoard =
+      document.getElementById("gameBoard");
+
+    const movesValue =
+      document.getElementById("movesValue");
+
+    const matchesValue =
+      document.getElementById("matchesValue");
+
+    const timeValue =
+      document.getElementById("timeValue");
+
+    const feedback =
+      document.getElementById("feedback");
+
+    const restartButton =
+      document.getElementById("restartButton");
+
+    const factPopup =
+      document.getElementById("factPopup");
+
+    const factLogo =
+      document.getElementById("factLogo");
+
+    const factOrganization =
+      document.getElementById("factOrganization");
+
+    const factText =
+      document.getElementById("factText");
+
+    const factContinueButton =
+      document.getElementById("factContinueButton");
+
+    const completionPanel =
+      document.getElementById("completionPanel");
+
+    const completionScore =
+      document.getElementById("completionScore");
+
+    const playAgainButton =
+      document.getElementById("playAgainButton");
+
+    let firstCard = null;
+    let secondCard = null;
+    let boardLocked = false;
+    let moves = 0;
+    let matches = 0;
+    let elapsedSeconds = 0;
+    let timer = null;
+    let gameStarted = false;
+    let mismatchTimeout = null;
+    let pendingFinish = false;
+
+    const factQueues = {};
+
+    function shuffle(array) {
+      const copy = [...array];
+
+      for (
+        let index = copy.length - 1;
+        index > 0;
+        index--
+      ) {
+        const randomIndex = Math.floor(
+          Math.random() * (index + 1)
+        );
+
+        [copy[index], copy[randomIndex]] = [
+          copy[randomIndex],
+          copy[index]
+        ];
+      }
+
+      return copy;
+    }
+
+    function createFactQueue(organization) {
+      factQueues[organization.id] =
+        shuffle([...organization.facts]);
+    }
+
+    function getNextFact(organization) {
+      if (
+        !factQueues[organization.id] ||
+        factQueues[organization.id].length === 0
+      ) {
+        createFactQueue(organization);
+      }
+
+      return factQueues[organization.id].shift();
+    }
+
+    function showFact(organization) {
+      factLogo.src =
+        organization.popupImage;
+
+      factLogo.alt =
+        organization.name + " logo";
+
+      factOrganization.textContent =
+        organization.name;
+
+      factText.textContent =
+        getNextFact(organization);
+
+      factPopup.classList.add("show");
+      boardLocked = true;
+
+      setTimeout(function() {
+        factContinueButton.focus();
+      }, 50);
+    }
+
+    function closeFact() {
+      factPopup.classList.remove("show");
+      boardLocked = false;
+
+      if (pendingFinish) {
+        pendingFinish = false;
+        finishGame();
+      }
+    }
+
+    function formatTime(totalSeconds) {
+      const minutes =
+        Math.floor(totalSeconds / 60);
+
+      const seconds =
+        totalSeconds % 60;
+
+      return (
+        minutes +
+        ":" +
+        String(seconds).padStart(2, "0")
+      );
+    }
+
+    function startTimer() {
+      if (timer) {
+        return;
+      }
+
+      timer = setInterval(function() {
+        elapsedSeconds += 1;
+
+        timeValue.textContent =
+          formatTime(elapsedSeconds);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function createDeck() {
+      return shuffle(
+        organizations.flatMap(
+          function(organization) {
+            return [
+              {
+                ...organization,
+                instance: organization.id + "-a"
+              },
+              {
+                ...organization,
+                instance: organization.id + "-b"
+              }
+            ];
+          }
+        )
+      );
+    }
+
+    function buildBoard() {
+      stopTimer();
+      clearTimeout(mismatchTimeout);
+
+      firstCard = null;
+      secondCard = null;
+      boardLocked = false;
+      moves = 0;
+      matches = 0;
+      elapsedSeconds = 0;
+      gameStarted = false;
+      pendingFinish = false;
+
+      movesValue.textContent = "0";
+      matchesValue.textContent = "0";
+      timeValue.textContent = "0:00";
+
+      feedback.textContent =
+        "Choose two cards.";
+
+      feedback.className =
+        "feedback";
+
+      factPopup.classList.remove("show");
+      completionPanel.classList.remove("show");
+      gameBoard.innerHTML = "";
+
+      const deck = createDeck();
+
+      deck.forEach(function(cardData) {
+        const card =
+          document.createElement("button");
+
+        card.type = "button";
+        card.className = "memory-card";
+        card.dataset.matchId = cardData.id;
+        card.dataset.name = cardData.name;
+
+        card.setAttribute(
+          "aria-label",
+          "Hidden memory card"
+        );
+
+        card.innerHTML = `
+          <span class="card-inner">
+
+            <span class="card-face card-front">
+              <img
+                src="${faceCardImage}"
+                alt=""
+                aria-hidden="true"
+              >
+            </span>
+
+            <span class="card-face card-back">
+              <img
+                src="${cardData.image}"
+                alt="${cardData.name}"
+              >
+            </span>
+
+          </span>
+        `;
+
+        card.addEventListener(
+          "click",
+          function() {
+            flipCard(card);
+          }
+        );
+
+        gameBoard.appendChild(card);
+      });
+    }
+
+    function flipCard(card) {
+      if (boardLocked) {
+        return;
+      }
+
+      if (
+        card === firstCard ||
+        card.classList.contains("matched")
+      ) {
+        return;
+      }
+
+      if (!gameStarted) {
+        gameStarted = true;
+        startTimer();
+      }
+
+      card.classList.add("flipped");
+
+      card.setAttribute(
+        "aria-label",
+        card.dataset.name
+      );
+
+      if (!firstCard) {
+        firstCard = card;
+
+        feedback.textContent =
+          "Choose the matching logo.";
+
+        return;
+      }
+
+      secondCard = card;
+      boardLocked = true;
+      moves += 1;
+
+      movesValue.textContent = moves;
+
+      checkForMatch();
+    }
+
+    function checkForMatch() {
+      const isMatch =
+        firstCard.dataset.matchId ===
+        secondCard.dataset.matchId;
+
+      if (isMatch) {
+        handleMatch();
+      } else {
+        handleMismatch();
+      }
+    }
+
+    function handleMatch() {
+      const matchedId =
+        firstCard.dataset.matchId;
+
+      const matchedOrganization =
+        organizations.find(
+          function(organization) {
+            return organization.id === matchedId;
+          }
+        );
+
+      firstCard.classList.add("matched");
+      secondCard.classList.add("matched");
+
+      firstCard.disabled = true;
+      secondCard.disabled = true;
+
+      matches += 1;
+
+      matchesValue.textContent =
+        matches;
+
+      feedback.textContent =
+        "Match found: " +
+        matchedOrganization.name +
+        "!";
+
+      feedback.className =
+        "feedback match";
+
+      firstCard = null;
+      secondCard = null;
+
+      if (
+        matches === organizations.length
+      ) {
+        stopTimer();
+        pendingFinish = true;
+      }
+
+      setTimeout(function() {
+        showFact(matchedOrganization);
+      }, 350);
+    }
+
+    function handleMismatch() {
+      feedback.textContent =
+        "Not a match.";
+
+      mismatchTimeout =
+        setTimeout(function() {
+          if (!firstCard || !secondCard) {
+            return;
+          }
+
+          firstCard.classList.remove("flipped");
+          secondCard.classList.remove("flipped");
+
+          firstCard.setAttribute(
+            "aria-label",
+            "Hidden memory card"
+          );
+
+          secondCard.setAttribute(
+            "aria-label",
+            "Hidden memory card"
+          );
+
+          feedback.textContent =
+            "Choose two cards.";
+
+          feedback.className =
+            "feedback";
+
+          firstCard = null;
+          secondCard = null;
+          boardLocked = false;
+        }, 750);
+    }
+
+    function finishGame() {
+      stopTimer();
+
+      feedback.textContent =
+        "You matched every organization!";
+
+      feedback.className =
+        "feedback match";
+
+      completionScore.textContent =
+        moves +
+        " moves in " +
+        formatTime(elapsedSeconds);
+
+      setTimeout(function() {
+        completionPanel.classList.add("show");
+      }, 250);
+    }
+
+    factContinueButton.addEventListener(
+      "click",
+      closeFact
+    );
+
+    factPopup.addEventListener(
+      "click",
+      function(event) {
+        if (event.target === factPopup) {
+          closeFact();
+        }
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      function(event) {
+        if (
+          event.key === "Escape" &&
+          factPopup.classList.contains("show")
+        ) {
+          closeFact();
+        }
+      }
+    );
+
+    restartButton.addEventListener(
+      "click",
+      buildBoard
+    );
+
+    playAgainButton.addEventListener(
+      "click",
+      buildBoard
+    );
+
+    buildBoard();
+  </script>
+
+</body>
+</html>
