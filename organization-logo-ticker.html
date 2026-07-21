@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Woods System of Care Affiliates</title>
+
+  <style>
+    :root {
+      --ticker-speed: 52s;
+      --logo-size: 150px;
+      --logo-space: 180px;
+      --gap: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .affiliate-ticker {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      padding: 18px 0;
+      background: transparent;
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: ticker-scroll var(--ticker-speed) linear infinite;
+      will-change: transform;
+    }
+
+    .affiliate-ticker:hover .ticker-track,
+    .affiliate-ticker:focus-within .ticker-track {
+      animation-play-state: paused;
+    }
+
+    .ticker-group {
+      display: flex;
+      align-items: center;
+      gap: var(--gap);
+      padding-right: var(--gap);
+    }
+
+    .affiliate-link {
+      width: var(--logo-space);
+      height: var(--logo-space);
+      flex: 0 0 var(--logo-space);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border-radius: 28px;
+      transition:
+        transform 180ms ease,
+        filter 180ms ease;
+    }
+
+    .affiliate-link:hover,
+    .affiliate-link:focus-visible {
+      transform: translateY(-7px) scale(1.04);
+      filter: brightness(1.05);
+      outline: none;
+    }
+
+    .affiliate-link img {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    @keyframes ticker-scroll {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --ticker-speed: 42s;
+        --logo-size: 110px;
+        --logo-space: 140px;
+        --gap: 18px;
+      }
+
+      .affiliate-ticker {
+        padding: 12px 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html,
+      body {
+        overflow: auto;
+      }
+
+      .affiliate-ticker {
+        overflow-x: auto;
+      }
+
+      .ticker-track {
+        animation: none;
+      }
+
+      .ticker-group[aria-hidden="true"] {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div
+    class="affiliate-ticker"
+    aria-label="Woods System of Care organizations"
+  >
+
+    <div
+      class="ticker-track"
+      id="tickerTrack"
+    >
+
+      <div
+        class="ticker-group"
+        id="tickerGroup"
+      >
+
+        <a
+          class="affiliate-link"
+          href="https://abilitiesnw.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Abilities of Northwest Jersey"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/abilities-of-northwest-jersey.png"
+            alt="Abilities of Northwest Jersey"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.abilities4work.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Abilities Solutions"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/abilities-solutions.png"
+            alt="Abilities Solutions"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://alliesnj.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Allies, Inc."
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/allies-inc.png"
+            alt="Allies, Inc."
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://archwayprograms.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Archway Programs"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/archway-programs.png"
+            alt="Archway Programs"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.brianshouse.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Brian's House"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/brians-house.png"
+            alt="Brian's House"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.bridgewaybhs.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Bridgeway Behavioral Health Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/bridgeway-behavioral-health-services.png"
+            alt="Bridgeway Behavioral Health Services"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.legacytreatment.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Legacy Treatment Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/legacy-treatment-services.png"
+            alt="Legacy Treatment Services"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://taborservicesinc.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Tabor Children's Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/tabor-childrens-services.png"
+            alt="Tabor Children's Services"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://woodshealthcare.org/behavioral-care/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit The Center for Behavioral Health"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/the-center-for-behavioral-health.png"
+            alt="The Center for Behavioral Health"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://woodshealthcare.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit The Medical Center at Woods"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/the-medical-center-at-woods.png"
+            alt="The Medical Center at Woods"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.woods.org/services/wcs/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Woods Community Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/woods-community-services.png"
+            alt="Woods Community Services"
+          >
+        </a>
+
+        <a
+          class="affiliate-link"
+          href="https://www.woods.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Woods System of Care"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/WSOC-Company-PNG/woods-system-of-care.png"
+            alt="Woods System of Care"
+          >
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const tickerTrack = document.getElementById("tickerTrack");
+    const originalGroup = document.getElementById("tickerGroup");
+    const duplicateGroup = originalGroup.cloneNode(true);
+
+    duplicateGroup.removeAttribute("id");
+    duplicateGroup.setAttribute("aria-hidden", "true");
+
+    duplicateGroup.querySelectorAll("a").forEach(function(link) {
+      link.setAttribute("tabindex", "-1");
+    });
+
+    tickerTrack.appendChild(duplicateGroup);
+  </script>
+
+</body>
+</html>
