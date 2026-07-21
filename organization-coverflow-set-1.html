@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Woods System of Care Cover Flow</title>
+
+  <style>
+    :root {
+      --logo-size: 205px;
+      --stage-height: 320px;
+      --text: #17324d;
+      --muted: #60758a;
+      --accent: #093266;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background: transparent;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+    }
+
+    body {
+      background: transparent;
+    }
+
+    .coverflow-widget {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      padding: 10px 0 8px;
+      background: transparent;
+    }
+
+    .coverflow-heading {
+      position: relative;
+      z-index: 30;
+      padding: 0 20px 4px;
+      text-align: center;
+    }
+
+    .coverflow-heading h2 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .coverflow-heading p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .coverflow-stage {
+      position: relative;
+      width: 100%;
+      height: var(--stage-height);
+      overflow: hidden;
+      perspective: 1350px;
+      perspective-origin: 50% 45%;
+      touch-action: pan-y;
+    }
+
+    .coverflow-track {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+
+    .coverflow-item {
+      position: absolute;
+      top: 34px;
+      left: 50%;
+      width: var(--logo-size);
+      height: var(--logo-size);
+      margin-left: calc(var(--logo-size) / -2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 34px;
+      text-decoration: none;
+      transform-style: preserve-3d;
+      transition:
+        transform 520ms cubic-bezier(.22, .75, .18, 1),
+        opacity 420ms ease,
+        filter 420ms ease;
+      will-change: transform, opacity;
+    }
+
+    .coverflow-item img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 34px;
+      filter:
+        drop-shadow(0 16px 20px rgba(25, 48, 74, 0.18))
+        drop-shadow(0 4px 7px rgba(25, 48, 74, 0.10));
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .coverflow-item.is-center {
+      z-index: 20;
+    }
+
+    .coverflow-item.is-center:hover,
+    .coverflow-item.is-center:focus-visible {
+      transform:
+        translateX(var(--item-x))
+        translateZ(220px)
+        rotateY(0deg)
+        scale(1.07) !important;
+      outline: none;
+    }
+
+    .coverflow-label {
+      position: absolute;
+      z-index: 25;
+      left: 50%;
+      bottom: 10px;
+      width: min(580px, 76%);
+      transform: translateX(-50%);
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .coverflow-arrow {
+      position: absolute;
+      z-index: 40;
+      top: 50%;
+      width: 46px;
+      height: 46px;
+      margin-top: -23px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0 3px;
+      border: 1px solid rgba(23, 50, 77, 0.14);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 20px rgba(25, 48, 74, 0.14);
+      color: var(--accent);
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      transition:
+        transform 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+    }
+
+    .coverflow-arrow:hover,
+    .coverflow-arrow:focus-visible {
+      transform: scale(1.08);
+      background: #ffffff;
+      box-shadow: 0 12px 26px rgba(25, 48, 74, 0.20);
+      outline: none;
+    }
+
+    .coverflow-arrow.previous {
+      left: 18px;
+    }
+
+    .coverflow-arrow.next {
+      right: 18px;
+    }
+
+    .coverflow-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 18px;
+      padding: 2px 18px 0;
+    }
+
+    .coverflow-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(23, 50, 77, 0.22);
+      cursor: pointer;
+      transition:
+        transform 180ms ease,
+        background 180ms ease;
+    }
+
+    .coverflow-dot.active {
+      transform: scale(1.45);
+      background: var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --logo-size: 150px;
+        --stage-height: 255px;
+      }
+
+      .coverflow-widget {
+        padding-top: 6px;
+      }
+
+      .coverflow-heading {
+        padding-bottom: 0;
+      }
+
+      .coverflow-item {
+        top: 30px;
+        border-radius: 27px;
+      }
+
+      .coverflow-item img {
+        border-radius: 27px;
+      }
+
+      .coverflow-label {
+        bottom: 7px;
+        font-size: 14px;
+      }
+
+      .coverflow-arrow {
+        width: 40px;
+        height: 40px;
+        margin-top: -20px;
+        font-size: 23px;
+      }
+
+      .coverflow-arrow.previous {
+        left: 7px;
+      }
+
+      .coverflow-arrow.next {
+        right: 7px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .coverflow-item {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section
+    class="coverflow-widget"
+    aria-labelledby="coverflowTitle"
+  >
+
+    <header class="coverflow-heading">
+      <h2 id="coverflowTitle">
+        Explore the Woods System of Care
+      </h2>
+
+      <p>
+        Select an organization to visit its website.
+      </p>
+    </header>
+
+    <div
+      class="coverflow-stage"
+      id="coverflowStage"
+    >
+
+      <div
+        class="coverflow-track"
+        id="coverflowTrack"
+      >
+
+        <a
+          class="coverflow-item"
+          href="https://alliesnj.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Allies, Inc."
+          aria-label="Visit Allies, Inc."
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Allies%2C%20Inc.%20Rounded%20Square%20Icon.png"
+            alt="Allies, Inc."
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://archwayprograms.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Archway Programs"
+          aria-label="Visit Archway Programs"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Archway%20Programs%20Rounded%20Square%20Icon.png"
+            alt="Archway Programs"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.brianshouse.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Brian's House"
+          aria-label="Visit Brian's House"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Brian%E2%80%99s%20House%20Rounded%20Square%20Icon.png"
+            alt="Brian's House"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.bridgewaybhs.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Bridgeway Behavioral Health Services"
+          aria-label="Visit Bridgeway Behavioral Health Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Bridgeway%20Behavioral%20Health%20Services%20Rounded%20Square%20Icon.png"
+            alt="Bridgeway Behavioral Health Services"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.legacytreatment.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Legacy Treatment Services"
+          aria-label="Visit Legacy Treatment Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Legacy%20Treatment%20Services%20Rounded%20Square%20Icon.png"
+            alt="Legacy Treatment Services"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://taborservicesinc.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Tabor Children's Services"
+          aria-label="Visit Tabor Children's Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Tabor%20Children%E2%80%99s%20Services%20Rounded%20Square%20Icon.png"
+            alt="Tabor Children's Services"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://woodsservicespa.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Woods Services"
+          aria-label="Visit Woods Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Woods%20Services%20Rounded%20Square%20Icon.png"
+            alt="Woods Services"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.woods.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Woods System of Care"
+          aria-label="Visit Woods System of Care"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Woods%20System%20of%20Care%20Rounded%20Square%20Icon.png"
+            alt="Woods System of Care"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.woods.org/services/wcs/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Woods Community Services"
+          aria-label="Visit Woods Community Services"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/WCS%20WSOC.png"
+            alt="Woods Community Services"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://woodshealthcare.org/behavioral-care/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="The Center for Behavioral Health"
+          aria-label="Visit The Center for Behavioral Health"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/The%20ceneter%20for%20Bheavioral%20health.png"
+            alt="The Center for Behavioral Health"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://woodshealthcare.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="The Medical Center at Woods"
+          aria-label="Visit The Medical Center at Woods"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/The%20Medical%20Center.png"
+            alt="The Medical Center at Woods"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://abilitiesnw.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Abilities of Northwest Jersey"
+          aria-label="Visit Abilities of Northwest Jersey"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Abilities%20Of%20north%20west.png"
+            alt="Abilities of Northwest Jersey"
+          >
+        </a>
+
+        <a
+          class="coverflow-item"
+          href="https://www.abilities4work.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-name="Abilities Solutions"
+          aria-label="Visit Abilities Solutions"
+        >
+          <img
+            src="https://raw.githubusercontent.com/jim122298/WSOC-Portal-Assets/main/Square%20Icons%20with%20shadow/Abilitie%20soultions.png"
+            alt="Abilities Solutions"
+          >
+        </a>
+
+      </div>
+
+      <div
+        class="coverflow-label"
+        id="coverflowLabel"
+        aria-live="polite"
+      ></div>
+
+      <button
+        class="coverflow-arrow previous"
+        id="previousButton"
+        type="button"
+        aria-label="Previous organization"
+      >
+        ‹
+      </button>
+
+      <button
+        class="coverflow-arrow next"
+        id="nextButton"
+        type="button"
+        aria-label="Next organization"
+      >
+        ›
+      </button>
+
+    </div>
+
+    <div
+      class="coverflow-dots"
+      id="coverflowDots"
+      aria-label="Choose an organization"
+    ></div>
+
+  </section>
+
+  <script>
+    const items = Array.from(
+      document.querySelectorAll(".coverflow-item")
+    );
+
+    const stage = document.getElementById("coverflowStage");
+    const label = document.getElementById("coverflowLabel");
+    const dotsContainer = document.getElementById("coverflowDots");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+
+    let currentIndex = 0;
+    let autoRotateTimer = null;
+    let pointerStartX = null;
+
+    items.forEach(function(item, index) {
+      const dot = document.createElement("button");
+
+      dot.type = "button";
+      dot.className = "coverflow-dot";
+
+      dot.setAttribute(
+        "aria-label",
+        "Show " + item.dataset.name
+      );
+
+      dot.addEventListener("click", function() {
+        currentIndex = index;
+        updateCoverFlow();
+        restartAutoRotate();
+      });
+
+      dotsContainer.appendChild(dot);
+
+      item.addEventListener("click", function(event) {
+        if (index !== currentIndex) {
+          event.preventDefault();
+          currentIndex = index;
+          updateCoverFlow();
+          restartAutoRotate();
+        }
+      });
+    });
+
+    const dots = Array.from(
+      document.querySelectorAll(".coverflow-dot")
+    );
+
+    function getCircularDifference(index, centerIndex, length) {
+      let difference = index - centerIndex;
+
+      if (difference > length / 2) {
+        difference -= length;
+      }
+
+      if (difference < -length / 2) {
+        difference += length;
+      }
+
+      return difference;
+    }
+
+    function updateCoverFlow() {
+      const isMobile = window.innerWidth <= 720;
+
+      const spacing = isMobile ? 145 : 225;
+      const sideRotation = isMobile ? 48 : 54;
+      const maximumVisibleDistance = isMobile ? 2 : 3;
+
+      items.forEach(function(item, index) {
+        const difference = getCircularDifference(
+          index,
+          currentIndex,
+          items.length
+        );
+
+        const absoluteDifference = Math.abs(difference);
+        const direction = difference < 0 ? -1 : 1;
+
+        item.classList.toggle(
+          "is-center",
+          difference === 0
+        );
+
+        if (absoluteDifference > maximumVisibleDistance) {
+          item.style.opacity = "0";
+          item.style.pointerEvents = "none";
+          item.style.zIndex = "0";
+
+          item.style.transform =
+            "translateX(" +
+            (direction * spacing * maximumVisibleDistance) +
+            "px) translateZ(-500px) scale(0.48)";
+
+          return;
+        }
+
+        let translateX = difference * spacing;
+        let translateZ;
+        let rotateY;
+        let scale;
+        let opacity;
+
+        if (difference === 0) {
+          translateZ = 190;
+          rotateY = 0;
+          scale = 1;
+          opacity = 1;
+
+          item.style.pointerEvents = "auto";
+          item.style.zIndex = "20";
+        } else {
+          translateZ = 15 - absoluteDifference * 95;
+          rotateY = direction * -sideRotation;
+          scale = 0.82 - absoluteDifference * 0.07;
+          opacity = 0.90 - absoluteDifference * 0.17;
+
+          item.style.pointerEvents = "auto";
+          item.style.zIndex = String(15 - absoluteDifference);
+        }
+
+        item.style.setProperty(
+          "--item-x",
+          translateX + "px"
+        );
+
+        item.style.opacity = String(
+          Math.max(opacity, 0.22)
+        );
+
+        item.style.filter =
+          "brightness(" +
+          (
+            difference === 0
+              ? 1
+              : Math.max(
+                  0.72,
+                  0.93 - absoluteDifference * 0.06
+                )
+          ) +
+          ")";
+
+        item.style.transform =
+          "translateX(" +
+          translateX +
+          "px) translateZ(" +
+          translateZ +
+          "px) rotateY(" +
+          rotateY +
+          "deg) scale(" +
+          scale +
+          ")";
+      });
+
+      label.textContent = items[currentIndex].dataset.name;
+
+      dots.forEach(function(dot, index) {
+        const isActive = index === currentIndex;
+
+        dot.classList.toggle("active", isActive);
+
+        dot.setAttribute(
+          "aria-current",
+          isActive ? "true" : "false"
+        );
+      });
+    }
+
+    function showPrevious() {
+      currentIndex =
+        (currentIndex - 1 + items.length) % items.length;
+
+      updateCoverFlow();
+      restartAutoRotate();
+    }
+
+    function showNext() {
+      currentIndex =
+        (currentIndex + 1) % items.length;
+
+      updateCoverFlow();
+      restartAutoRotate();
+    }
+
+    function startAutoRotate() {
+      clearInterval(autoRotateTimer);
+
+      autoRotateTimer = setInterval(function() {
+        currentIndex =
+          (currentIndex + 1) % items.length;
+
+        updateCoverFlow();
+      }, 4300);
+    }
+
+    function restartAutoRotate() {
+      startAutoRotate();
+    }
+
+    previousButton.addEventListener(
+      "click",
+      showPrevious
+    );
+
+    nextButton.addEventListener(
+      "click",
+      showNext
+    );
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft") {
+        showPrevious();
+      }
+
+      if (event.key === "ArrowRight") {
+        showNext();
+      }
+    });
+
+    stage.addEventListener("pointerdown", function(event) {
+      pointerStartX = event.clientX;
+    });
+
+    stage.addEventListener("pointerup", function(event) {
+      if (pointerStartX === null) {
+        return;
+      }
+
+      const distance = event.clientX - pointerStartX;
+
+      if (Math.abs(distance) > 45) {
+        if (distance > 0) {
+          showPrevious();
+        } else {
+          showNext();
+        }
+      }
+
+      pointerStartX = null;
+    });
+
+    stage.addEventListener("mouseenter", function() {
+      clearInterval(autoRotateTimer);
+    });
+
+    stage.addEventListener("mouseleave", function() {
+      startAutoRotate();
+    });
+
+    window.addEventListener(
+      "resize",
+      updateCoverFlow
+    );
+
+    updateCoverFlow();
+    startAutoRotate();
+  </script>
+
+</body>
+</html>
